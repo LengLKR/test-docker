@@ -1,6 +1,38 @@
 version: '3' # กำหนด docker version
 services:
   node-server: # ตั้งชื่อ container (เหมือน --name)
+    container_name: node
     build: . # ตำแหน่ง dockerfile
     ports:
-      - "8000:8000" # map port ออกมา เหมือน -p ใน docker run 
+      - "8000:8000" # map port ออกมา เหมือน -p ใน docker run
+    networks:
+      - mynetwork
+
+  db:
+    image: mysql:latest
+    container_name: db
+    environment:
+      MYSQL_ROOT_PASSWORD: root # กำหนด user ของ root mysql
+      MYSQL_DATABASE: tutorial # กำหนด database เริ่มต้นของ mysql
+    ports:
+      - "3307:3306"
+    networks:
+      - mynetwork
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
